@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Puzzle Code Quest</title>
+<link rel="stylesheet" href="plantas.css">
+
+</head>
+
+<body>
+
+  <!-- IZQUIERDA -->
+  <div id="game">
+    <canvas id="canvas" width="400" height="400"></canvas>
+  </div>
+
+  <!-- DERECHA -->
+  <div id="code">
+    <h3>Escribe tu código:</h3>
+    <textarea id="editor">
+avanzar();
+avanzar();
+girarDerecha();
+    </textarea>
+    <button onclick="ejecutarCodigo()">Ejecutar</button>
+  </div>
+
+  <script>
+    const canvas = document.getElementById("canvas");
+    const ctx = canvas.getContext("2d");
+
+    let x = 50;
+    let y = 50;
+
+    function dibujar() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = "blue";
+      ctx.fillRect(x, y, 30, 30);
+    }
+
+    function avanzar() {
+      y += 40;
+    }
+
+    function girarDerecha() {
+      x += 40;
+    }
+
+    function ejecutarCodigo() {
+      let codigo = document.getElementById("editor").value;
+
+      try {
+        eval(codigo); // ejecuta lo que escribe el alumno
+      } catch (e) {
+        alert("Error en tu código");
+      }
+
+      dibujar();
+    }
+
+    dibujar();
+  </script>
+
+</body>
+</html>
