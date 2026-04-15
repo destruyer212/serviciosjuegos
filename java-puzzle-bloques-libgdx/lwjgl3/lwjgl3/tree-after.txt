@@ -1,0 +1,56 @@
+com.nuevooooooo:lwjgl3:jar:1.0.0
++- com.badlogicgames.gdx:gdx:jar:1.13.1:compile
+|  \- com.badlogicgames.gdx:gdx-jnigen-loader:jar:2.5.2:compile
++- com.nuevooooooo:core:jar:1.0.0:compile
++- com.badlogicgames.gdx:gdx-backend-lwjgl3:jar:1.13.1:compile
+|  +- org.lwjgl:lwjgl:jar:3.3.3:compile
+|  +- org.lwjgl:lwjgl:jar:natives-linux:3.3.3:compile
+|  +- org.lwjgl:lwjgl:jar:natives-linux-arm32:3.3.3:compile
+|  +- org.lwjgl:lwjgl:jar:natives-linux-arm64:3.3.3:compile
+|  +- org.lwjgl:lwjgl:jar:natives-macos:3.3.3:compile
+|  +- org.lwjgl:lwjgl:jar:natives-macos-arm64:3.3.3:compile
+|  +- org.lwjgl:lwjgl:jar:natives-windows:3.3.3:compile
+|  +- org.lwjgl:lwjgl:jar:natives-windows-x86:3.3.3:compile
+|  +- org.lwjgl:lwjgl-glfw:jar:3.3.3:compile
+|  +- org.lwjgl:lwjgl-glfw:jar:natives-linux:3.3.3:compile
+|  +- org.lwjgl:lwjgl-glfw:jar:natives-linux-arm32:3.3.3:compile
+|  +- org.lwjgl:lwjgl-glfw:jar:natives-linux-arm64:3.3.3:compile
+|  +- org.lwjgl:lwjgl-glfw:jar:natives-macos:3.3.3:compile
+|  +- org.lwjgl:lwjgl-glfw:jar:natives-macos-arm64:3.3.3:compile
+|  +- org.lwjgl:lwjgl-glfw:jar:natives-windows:3.3.3:compile
+|  +- org.lwjgl:lwjgl-glfw:jar:natives-windows-x86:3.3.3:compile
+|  +- org.lwjgl:lwjgl-jemalloc:jar:3.3.3:compile
+|  +- org.lwjgl:lwjgl-jemalloc:jar:natives-linux:3.3.3:compile
+|  +- org.lwjgl:lwjgl-jemalloc:jar:natives-linux-arm32:3.3.3:compile
+|  +- org.lwjgl:lwjgl-jemalloc:jar:natives-linux-arm64:3.3.3:compile
+|  +- org.lwjgl:lwjgl-jemalloc:jar:natives-macos:3.3.3:compile
+|  +- org.lwjgl:lwjgl-jemalloc:jar:natives-macos-arm64:3.3.3:compile
+|  +- org.lwjgl:lwjgl-jemalloc:jar:natives-windows:3.3.3:compile
+|  +- org.lwjgl:lwjgl-jemalloc:jar:natives-windows-x86:3.3.3:compile
+|  +- org.lwjgl:lwjgl-openal:jar:3.3.3:compile
+|  +- org.lwjgl:lwjgl-openal:jar:natives-linux:3.3.3:compile
+|  +- org.lwjgl:lwjgl-openal:jar:natives-linux-arm32:3.3.3:compile
+|  +- org.lwjgl:lwjgl-openal:jar:natives-linux-arm64:3.3.3:compile
+|  +- org.lwjgl:lwjgl-openal:jar:natives-macos:3.3.3:compile
+|  +- org.lwjgl:lwjgl-openal:jar:natives-macos-arm64:3.3.3:compile
+|  +- org.lwjgl:lwjgl-openal:jar:natives-windows:3.3.3:compile
+|  +- org.lwjgl:lwjgl-openal:jar:natives-windows-x86:3.3.3:compile
+|  +- org.lwjgl:lwjgl-opengl:jar:3.3.3:compile
+|  +- org.lwjgl:lwjgl-opengl:jar:natives-linux:3.3.3:compile
+|  +- org.lwjgl:lwjgl-opengl:jar:natives-linux-arm32:3.3.3:compile
+|  +- org.lwjgl:lwjgl-opengl:jar:natives-linux-arm64:3.3.3:compile
+|  +- org.lwjgl:lwjgl-opengl:jar:natives-macos:3.3.3:compile
+|  +- org.lwjgl:lwjgl-opengl:jar:natives-macos-arm64:3.3.3:compile
+|  +- org.lwjgl:lwjgl-opengl:jar:natives-windows:3.3.3:compile
+|  +- org.lwjgl:lwjgl-opengl:jar:natives-windows-x86:3.3.3:compile
+|  +- org.lwjgl:lwjgl-stb:jar:3.3.3:compile
+|  +- org.lwjgl:lwjgl-stb:jar:natives-linux:3.3.3:compile
+|  +- org.lwjgl:lwjgl-stb:jar:natives-linux-arm32:3.3.3:compile
+|  +- org.lwjgl:lwjgl-stb:jar:natives-linux-arm64:3.3.3:compile
+|  +- org.lwjgl:lwjgl-stb:jar:natives-macos:3.3.3:compile
+|  +- org.lwjgl:lwjgl-stb:jar:natives-macos-arm64:3.3.3:compile
+|  +- org.lwjgl:lwjgl-stb:jar:natives-windows:3.3.3:compile
+|  +- org.lwjgl:lwjgl-stb:jar:natives-windows-x86:3.3.3:compile
+|  +- com.badlogicgames.jlayer:jlayer:jar:1.0.1-gdx:compile
+|  \- org.jcraft:jorbis:jar:0.0.17:compile
+\- com.badlogicgames.gdx:gdx-platform:jar:natives-desktop:1.13.1:compile

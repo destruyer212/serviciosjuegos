@@ -1,0 +1,26 @@
+ext {
+    gdxVersion = "1.13.1"
+    ashleyVersion = "1.7.4"
+    gdxGltfVersion = "2.1.0"
+}
+
+allprojects {
+    apply plugin: "java"
+
+    repositories {
+        mavenCentral()
+        maven { url "https://jitpack.io" }
+    }
+
+    java {
+        toolchain {
+            languageVersion = JavaLanguageVersion.of(17)
+        }
+    }
+}
+
+subprojects {
+    tasks.withType(JavaCompile).configureEach {
+        options.encoding = "UTF-8"
+    }
+}

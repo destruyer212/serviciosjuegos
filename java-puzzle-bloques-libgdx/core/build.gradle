@@ -1,0 +1,5 @@
+dependencies {
+    api "com.badlogicgames.gdx:gdx:$gdxVersion"
+    implementation "com.badlogicgames.ashley:ashley:$ashleyVersion"
+    implementation "com.github.mgsx-dev.gdx-gltf:gltf:$gdxGltfVersion"
+}

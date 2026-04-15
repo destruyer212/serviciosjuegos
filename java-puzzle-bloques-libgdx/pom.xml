@@ -1,0 +1,101 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.nuevooooooo</groupId>
+    <artifactId>java-puzzle-bloques-libgdx-parent</artifactId>
+    <version>1.0.0</version>
+    <packaging>pom</packaging>
+
+    <modules>
+        <module>core</module>
+        <module>lwjgl3</module>
+    </modules>
+
+    <properties>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+        <maven.compiler.release>17</maven.compiler.release>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <gdx.version>1.13.1</gdx.version>
+        <ashley.version>1.7.4</ashley.version>
+        <gdx-gltf.version>2.1.0</gdx-gltf.version>
+        <!-- Pon true solo si insistes en usar Java 23+ (LWJGL puede fallar o no dibujar bien). -->
+        <enforcer.skip>false</enforcer.skip>
+    </properties>
+
+    <repositories>
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
+    </repositories>
+
+    <!-- Obliga a que gdx, backend y nativas sean la misma version (evita crash SharedLibraryLoader). -->
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.badlogicgames.gdx</groupId>
+                <artifactId>gdx</artifactId>
+                <version>${gdx.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.badlogicgames.gdx</groupId>
+                <artifactId>gdx-backend-lwjgl3</artifactId>
+                <version>${gdx.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.badlogicgames.gdx</groupId>
+                <artifactId>gdx-platform</artifactId>
+                <version>${gdx.version}</version>
+                <classifier>natives-desktop</classifier>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>3.13.0</version>
+                    <configuration>
+                        <release>17</release>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <version>3.5.0</version>
+                <executions>
+                    <execution>
+                        <id>enforce-java-for-libgdx-lwjgl</id>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <phase>validate</phase>
+                        <configuration>
+                            <skip>${enforcer.skip}</skip>
+                            <rules>
+                                <requireJavaVersion>
+                                    <version>[17,22]</version>
+                                    <message>
+LibGDX + LWJGL 3.3.x estan probados con JDK 17 a 22. Con Java 23+ suelen salir avisos JNI y el texto puede no dibujarse.
+Instala Eclipse Temurin 17 u 21, pon JAVA_HOME y PATH, y vuelve a ejecutar.
+Version actual: ${java.version} | JAVA_HOME: ${java.home}
+Para saltar esta comprobacion (no recomendado): mvn -Denforcer.skip=true ...
+                                    </message>
+                                </requireJavaVersion>
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>
