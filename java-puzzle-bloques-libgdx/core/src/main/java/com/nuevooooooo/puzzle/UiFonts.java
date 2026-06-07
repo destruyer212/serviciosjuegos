@@ -1,6 +1,7 @@
 package com.nuevooooooo.puzzle;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 
 /**
@@ -25,6 +26,9 @@ public final class UiFonts {
         }
         font.getData().setScale(Math.max(0.5f, scaleFactor));
         font.setUseIntegerPositions(false);
+        for (int i = 0; i < font.getRegions().size; i++) {
+            font.getRegion(i).getTexture().setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+        }
         return font;
     }
 }

@@ -15,7 +15,7 @@ public class PuzzleBloquesLibGDXGame extends Game {
     public void create() {
         uiFont = new BitmapFont(Gdx.files.internal("fonts/lsans-15.fnt"));
         uiFont.getData().setScale(24f / 15f);
-        setScreen(new StartMenuScreen(this));
+        setScreen(new MainMenuScreen(this));
     }
 
     @Override

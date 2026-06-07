@@ -8,7 +8,7 @@ public class Lwjgl3Launcher {
         warnIfUnsupportedJvm();
 
         Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
-        config.setTitle("Puzzle Bloques LibGDX");
+        config.setTitle("Codea y Juega con Robo");
         config.setWindowedMode(1280, 720);
         config.useVsync(true);
         new Lwjgl3Application(new PuzzleBloquesLibGDXGame(), config);
@@ -27,6 +27,7 @@ public class Lwjgl3Launcher {
             if (major >= 23) {
                 System.err.println("[Puzzle Bloques] Tu JDK es Java " + spec
                         + ". LibGDX+LWJGL suelen fallar o no dibujar texto. Usa JDK 17 u 21 (Temurin) y vuelve a ejecutar.");
+                System.err.println("[Puzzle Bloques] Para compilar cambios nuevos usa: run-game.cmd  (no solo mvn -pl lwjgl3 exec:java)");
             }
         } catch (NumberFormatException ignored) {
             // no-op
