@@ -429,7 +429,7 @@ public class MainMenuScreen extends ScreenAdapter {
         batch.begin();
         batch.setColor(Color.WHITE);
         batch.draw(menuPanel, LEFT_PANEL_X, LEFT_PANEL_Y, LEFT_PANEL_W, LEFT_PANEL_H);
-        batch.draw(characterPlatform, 842f, 46f, 438f, 136f);
+        batch.draw(characterPlatform, 828f, 38f, 462f, 148f);
         batch.end();
 
         drawLevelCards(true);
@@ -496,13 +496,13 @@ public class MainMenuScreen extends ScreenAdapter {
         float pulse = 0.55f + MathUtils.sin(time * 1.7f) * 0.10f;
         sr.begin(ShapeRenderer.ShapeType.Filled);
         sr.setColor(0f, 0.04f, 0.12f, 0.42f);
-        sr.ellipse(898f, 92f, 356f, 56f);
+        sr.ellipse(878f, 88f, 388f, 62f);
         sr.setColor(0.24f, 0.88f, 1f, 0.14f + pulse * 0.05f);
-        sr.ellipse(920f, 100f, 308f, 40f);
+        sr.ellipse(900f, 96f, 340f, 44f);
         sr.setColor(0.65f, 1f, 1f, 0.24f);
-        sr.ellipse(956f, 118f, 74f, 15f);
-        sr.ellipse(1054f, 118f, 86f, 16f);
-        sr.ellipse(1142f, 116f, 80f, 15f);
+        sr.ellipse(936f, 116f, 82f, 17f);
+        sr.ellipse(1044f, 116f, 94f, 18f);
+        sr.ellipse(1142f, 114f, 86f, 17f);
         sr.end();
     }
 
@@ -567,13 +567,13 @@ public class MainMenuScreen extends ScreenAdapter {
     }
 
     private void drawCharacterShowcase() {
-        float baseY = 112f + MathUtils.sin(time * 1.1f) * 4f;
-        float roboFloat = MathUtils.sin(time * 1.18f) * 6f;
-        float monoFloat = MathUtils.sin(time * 1.05f + 1.2f) * 6f;
-        float pirataFloat = MathUtils.sin(time * 0.95f + 2.1f) * 6f;
-        batch.draw(robo, 918f, baseY + roboFloat, 178f, 178f);
-        batch.draw(monoEspacial, 1002f, baseY - 8f + monoFloat, 214f, 214f);
-        batch.draw(pirataEspacial, 1098f, baseY - 2f + pirataFloat, 184f, 184f);
+        float baseY = 128f + MathUtils.sin(time * 1.1f) * 5f;
+        float roboFloat = MathUtils.sin(time * 1.18f) * 7f;
+        float monoFloat = MathUtils.sin(time * 1.05f + 1.2f) * 7f;
+        float pirataFloat = MathUtils.sin(time * 0.95f + 2.1f) * 7f;
+        batch.draw(robo, 848f, baseY + roboFloat, 252f, 252f);
+        batch.draw(monoEspacial, 938f, baseY - 10f + monoFloat, 302f, 302f);
+        batch.draw(pirataEspacial, 1048f, baseY - 4f + pirataFloat, 268f, 268f);
     }
 
     private void drawLevelCards(boolean homeLayout) {
