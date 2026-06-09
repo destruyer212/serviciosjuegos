@@ -1,5 +1,29 @@
+apply plugin: "java-library"
+
+def isWebBuild = { ->
+    gradle.startParameter.taskNames.any { name ->
+        name.contains("teavm") || name.contains("gdx_teavm")
+    }
+}
+
+sourceSets {
+    main {
+        java {
+            if (isWebBuild()) {
+                exclude "**/PuzzleGameScreen3D.java"
+                exclude "**/StartMenuScreen.java"
+                exclude "**/PuzzleGameScreen.java"
+                exclude "**/HeroConfig.java"
+                exclude "**/ecs/**"
+            }
+        }
+    }
+}
+
 dependencies {
     api "com.badlogicgames.gdx:gdx:$gdxVersion"
-    implementation "com.badlogicgames.ashley:ashley:$ashleyVersion"
-    implementation "com.github.mgsx-dev.gdx-gltf:gltf:$gdxGltfVersion"
+    if (!isWebBuild()) {
+        implementation "com.badlogicgames.ashley:ashley:$ashleyVersion"
+        implementation "com.github.mgsx-dev.gdx-gltf:gltf:$gdxGltfVersion"
+    }
 }
