@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.math.MathUtils;
@@ -18,6 +19,18 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import com.nuevooooooo.puzzle.ui.animation.StarCollectAnimator;
+import com.nuevooooooo.puzzle.ui.board.GameBoardRenderer;
+import com.nuevooooooo.puzzle.ui.board.MapSpeechBubbleRenderer;
+import com.nuevooooooo.puzzle.ui.hud.FooterHudRenderer;
+import com.nuevooooooo.puzzle.ui.hud.HudState;
+import com.nuevooooooo.puzzle.ui.hud.TopHudRenderer;
+import com.nuevooooooo.puzzle.ui.panels.BlockPalettePanelRenderer;
+import com.nuevooooooo.puzzle.ui.panels.ProgramPanelRenderer;
+import com.nuevooooooo.puzzle.ui.theme.SpaceTheme;
+import com.nuevooooooo.puzzle.ui.theme.SpaceThemeAssets;
+import com.nuevooooooo.puzzle.ui.theme.SpaceThemeRenderer;
+import com.nuevooooooo.puzzle.ui.widgets.ActionButtonsRenderer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,26 +39,23 @@ public class RoboCodeGameScreen extends ScreenAdapter {
     private static final float W = 1280f;
     private static final float H = 720f;
 
-    private static final int ROWS = 10;
-    private static final int COLS = 10;
-    private static final float CELL = 46f;
-    private static final float BOARD_X = 326f;
-    private static final float BOARD_Y = 126f;
-    private static final float BOARD_W = COLS * CELL;
-    private static final float BOARD_H = ROWS * CELL;
+    private static final int MAX_MAP_ROWS = 14;
+    private static final int MAX_MAP_COLS = 14;
+
+    private int mapRows = 10;
+    private int mapCols = 10;
+    private float cellSize = 46f;
+    private float boardX = SpaceTheme.BOARD_FRAME_X + (SpaceTheme.BOARD_FRAME_W - 10 * 46f) / 2f;
+    private float boardY = SpaceTheme.BOARD_FRAME_Y + (SpaceTheme.BOARD_FRAME_H - 10 * 46f) / 2f;
 
     private static final float LEFT_X = 14f;
     private static final float LEFT_W = 270f;
     private static final float SIDE_TOP_Y = 96f;
     private static final float SIDE_H = 554f;
-    private static final float PROGRAM_X = 832f;
-    private static final float PROGRAM_Y = 366f;
-    private static final float PROGRAM_W = 278f;
-    private static final float PROGRAM_H = 282f;
-    private static final float CODE_X = 832f;
-    private static final float CODE_Y = 114f;
-    private static final float CODE_W = 278f;
-    private static final float CODE_H = 234f;
+    private static final float PROGRAM_X = SpaceTheme.PROGRAM_X;
+    private static final float PROGRAM_Y = SpaceTheme.PROGRAM_Y;
+    private static final float PROGRAM_W = SpaceTheme.PROGRAM_W;
+    private static final float PROGRAM_H = SpaceTheme.PROGRAM_H;
     private static final float MODAL_X = 226f;
     private static final float MODAL_Y = 82f;
     private static final float MODAL_W = 828f;
@@ -54,10 +64,7 @@ public class RoboCodeGameScreen extends ScreenAdapter {
     private static final float FAIL_MODAL_Y = 162f;
     private static final float FAIL_MODAL_W = 500f;
     private static final float FAIL_MODAL_H = 360f;
-    private static final float RIGHT_X = 1132f;
-    private static final float ACTION_W = 124f;
-    private static final float ACTION_H = 54f;
-    private static final int MAX_PROGRAM_BLOCKS = 50;
+    private static final int MAX_PROGRAM_BLOCKS = 100;
 
     private static final float MOVE_TIME = 0.24f;
     private static final float RUN_STEP_TIME = 0.42f;
@@ -102,26 +109,61 @@ public class RoboCodeGameScreen extends ScreenAdapter {
                     }),
             new LevelData(
                     "Nivel 2: Ruta con nave",
-                    "Llega a la nave y cruza el vacio",
+                    "Sube a la nave, teleportate al otro lado y llega a la Meta",
                     new String[]{
                             "##########",
-                            "#S..#...G#",
-                            "#.#.#.##.#",
-                            "#.#.#.##.#",
-                            "#.#...~~.#",
-                            "#.###N##.#",
-                            "#....~~~.#",
-                            "###.#.##.#",
-                            "#...#....#",
+                            "#S......G#",
+                            "#.###.#..#",
+                            "#........#",
+                            "#.#...#..#",
+                            "#..N~~...#",
+                            "#..#.~~~T#",
+                            "#...##...#",
+                            "#..#.....#",
                             "##########"
                     },
                     new CellPoint[]{
                             new CellPoint(1, 3),
-                            new CellPoint(4, 6),
-                            new CellPoint(6, 7),
-                            new CellPoint(2, 8)
+                            new CellPoint(3, 2),
+                            new CellPoint(7, 2),
+                            new CellPoint(8, 5)
+                    }),
+            new LevelData(
+                    "Nivel 3: Laberinto estelar",
+                    "Recorre el laberinto, usa las dos naves y llega a la Meta",
+                    new String[]{
+                            "##############",
+                            "#S..###.....G#",
+                            "#.###.#.##...#",
+                            "#...#.#..#...#",
+                            "###.#.#..#...#",
+                            "#...#....#...#",
+                            "#.#######....#",
+                            "#.......#....#",
+                            "#.#####.#....#",
+                            "#.....#.#....#",
+                            "#.###.#.##...#",
+                            "#.....#......#",
+                            "#..N~~~~~~~T.#",
+                            "##############"
+                    },
+                    new CellPoint[]{
+                            new CellPoint(3, 3),
+                            new CellPoint(5, 4),
+                            new CellPoint(7, 1),
+                            new CellPoint(9, 3),
+                            new CellPoint(11, 2),
+                            new CellPoint(11, 7)
                     })
     };
+
+    private static int totalStarsInCampaign() {
+        int total = 0;
+        for (LevelData level : LEVELS) {
+            total += level.coins.length;
+        }
+        return total;
+    }
 
     private final PuzzleBloquesLibGDXGame game;
     private final SpriteBatch batch = new SpriteBatch();
@@ -148,7 +190,7 @@ public class RoboCodeGameScreen extends ScreenAdapter {
     private Texture guidePortrait;
     private Texture shipTexture;
 
-    private final char[][] map = new char[ROWS][COLS];
+    private final char[][] map = new char[MAX_MAP_ROWS][MAX_MAP_COLS];
     private final List<CommandButton> palette = new ArrayList<>();
     private final List<Command> program = new ArrayList<>();
     private final List<Command> executionQueue = new ArrayList<>();
@@ -156,16 +198,9 @@ public class RoboCodeGameScreen extends ScreenAdapter {
     private final List<CellPoint> previewPath = new ArrayList<>();
     private final List<PathStep> previewSteps = new ArrayList<>();
     private final List<CellPoint> coins = new ArrayList<>();
-    private final boolean[] collectedCoins = new boolean[4];
+    private boolean[] collectedCoins = new boolean[8];
 
-    private final Rectangle runButton = new Rectangle(RIGHT_X, 568, ACTION_W, ACTION_H);
-    private final Rectangle stepButton = new Rectangle(RIGHT_X, 502, ACTION_W, ACTION_H);
-    private final Rectangle pauseButton = new Rectangle(RIGHT_X, 436, ACTION_W, ACTION_H);
-    private final Rectangle undoButton = new Rectangle(RIGHT_X, 370, ACTION_W, ACTION_H);
-    private final Rectangle clearButton = new Rectangle(RIGHT_X, 304, ACTION_W, ACTION_H);
-    private final Rectangle resetButton = new Rectangle(RIGHT_X, 238, ACTION_W, ACTION_H);
-    private final Rectangle menuButton = new Rectangle(1184, 664, 62, 48);
-    private final Rectangle expandCodeButton = new Rectangle(CODE_X + 22f, CODE_Y + 18f, CODE_W - 44f, 34f);
+    private final Rectangle expandCodeButton = new Rectangle();
     private final Rectangle closeCodeButton = new Rectangle(MODAL_X + MODAL_W - 102f, MODAL_Y + MODAL_H - 56f, 72f, 34f);
     private final Rectangle failRetryButton = new Rectangle(FAIL_MODAL_X + 52f, FAIL_MODAL_Y + 42f, 128f, 46f);
     private final Rectangle failEditButton = new Rectangle(FAIL_MODAL_X + 186f, FAIL_MODAL_Y + 42f, 128f, 46f);
@@ -180,6 +215,8 @@ public class RoboCodeGameScreen extends ScreenAdapter {
     private int goalCol;
     private int shipRow = -1;
     private int shipCol = -1;
+    private int shipDestRow = -1;
+    private int shipDestCol = -1;
     private int currentLevelIndex;
     private int robotRow;
     private int robotCol;
@@ -197,6 +234,7 @@ public class RoboCodeGameScreen extends ScreenAdapter {
     private boolean running;
     private boolean showCodeModal;
     private boolean showFailModal;
+    private boolean failGameOver;
     private boolean showWinModal;
     private int executionIndex;
     private int activeProgramIndex = -1;
@@ -204,9 +242,11 @@ public class RoboCodeGameScreen extends ScreenAdapter {
     private float time;
     private String failReason = "Robo necesita otro algoritmo.";
     private String failAdvice = "Cambia el orden de tus bloques e intenta otra vez.";
+    private String failLivesMessage = "";
     private String winLesson = "Creaste una secuencia correcta.";
     private int coinsCollected;
-    private int stars = 3;
+    private int levelRating = 1;
+    private int lastCreditsEarned;
     private String status = "Toca bloques para armar tu programa.";
     private boolean usingShip;
     private boolean shipBoarded;
@@ -215,6 +255,18 @@ public class RoboCodeGameScreen extends ScreenAdapter {
     private int previewCol;
     private Direction previewFacing = Direction.RIGHT;
 
+    private SpaceThemeAssets themeAssets;
+    private SpaceThemeRenderer themeRenderer;
+    private TopHudRenderer topHudRenderer;
+    private FooterHudRenderer footerHudRenderer;
+    private BlockPalettePanelRenderer blockPalettePanelRenderer;
+    private GameBoardRenderer gameBoardRenderer;
+    private ProgramPanelRenderer programPanelRenderer;
+    private ActionButtonsRenderer actionButtonsRenderer;
+    private StarCollectAnimator starCollectAnimator;
+    private MapSpeechBubbleRenderer mapSpeechBubbleRenderer;
+    private final List<ProgramPanelRenderer.ProgramCommandView> programViews = new ArrayList<>();
+
     public RoboCodeGameScreen() {
         this(null);
     }
@@ -222,14 +274,42 @@ public class RoboCodeGameScreen extends ScreenAdapter {
     public RoboCodeGameScreen(PuzzleBloquesLibGDXGame game) {
         this.game = game;
         loadAssets();
+        initThemeUi();
         buildPalette();
+        currentLevelIndex = GameState.currentLevelIndex();
+        GameState.setMaxStars(totalStarsInCampaign());
         loadLevel();
         setupInput();
     }
 
+    private void initThemeUi() {
+        themeAssets = new SpaceThemeAssets();
+        themeRenderer = new SpaceThemeRenderer(themeAssets);
+        topHudRenderer = new TopHudRenderer(themeRenderer, titleFont, font, smallFont);
+        footerHudRenderer = new FooterHudRenderer(themeRenderer, font, smallFont);
+        blockPalettePanelRenderer = new BlockPalettePanelRenderer(themeRenderer, font);
+        gameBoardRenderer = new GameBoardRenderer(themeRenderer);
+        programPanelRenderer = new ProgramPanelRenderer(themeRenderer, font, smallFont);
+        actionButtonsRenderer = new ActionButtonsRenderer(themeRenderer, font, smallFont);
+        starCollectAnimator = new StarCollectAnimator();
+        mapSpeechBubbleRenderer = new MapSpeechBubbleRenderer(themeRenderer, smallFont);
+        layoutUiRects();
+    }
+
+    private void layoutUiRects() {
+        expandCodeButton.set(
+                SpaceTheme.CODE_BTN_X,
+                SpaceTheme.CODE_BTN_Y,
+                SpaceTheme.CODE_BTN_W,
+                SpaceTheme.CODE_BTN_H);
+    }
+
     private void loadAssets() {
         spaceBackground = texture("images/space_background_main.png");
-        shipTexture = texture("images/spaceship_menu.png");
+        shipTexture = texture("images/props/spaceship_goal.png");
+        if (GameState.selectedCharacter() == PlayerCharacter.MONO_ESPACIAL && !GameState.isMonoUnlocked()) {
+            GameState.selectCharacter(PlayerCharacter.ROBO);
+        }
         if (GameState.selectedCharacter() == PlayerCharacter.MONO_ESPACIAL) {
             roboIdle = texture("images/mono_espacial_idle_front.png");
             roboDown = texture("images/mono_espacial_look_down.png");
@@ -240,16 +320,26 @@ public class RoboCodeGameScreen extends ScreenAdapter {
             roboError = texture("images/mono_espacial_thinking.png");
             roboWin = texture("images/mono_espacial_wave.png");
             guidePortrait = texture("images/mono_espacial_wave.png");
+        } else if (GameState.selectedCharacter() == PlayerCharacter.PIRATA_ESPACIAL) {
+            roboIdle = texture("images/pirata_espacial_idle_front.png");
+            roboDown = texture("images/pirata_espacial_look_down.png");
+            roboBack = texture("images/pirata_espacial_back.png");
+            roboRight = texture("images/pirata_espacial_right.png");
+            roboLeft = texture("images/pirata_espacial_left.png");
+            roboUp = texture("images/pirata_espacial_look_up.png");
+            roboError = texture("images/pirata_espacial_thinking.png");
+            roboWin = texture("images/pirata_espacial_wave.png");
+            guidePortrait = texture("images/pirata_espacial_menu_pose.png");
         } else {
-            roboIdle = texture("images/robo_idle.png");
-            roboDown = texture("images/robo_down.png");
+            roboIdle = texture("images/chars/robo_idle.png");
+            roboDown = texture("images/chars/robo_down.png");
             roboBack = texture("images/robo_back.png");
-            roboRight = texture("images/robo_right.png");
-            roboLeft = texture("images/robo_left.png");
-            roboUp = texture("images/robo_up.png");
-            roboError = texture("images/robo_error.png");
-            roboWin = texture("images/robo_win.png");
-            guidePortrait = texture("images/robo_idle.png");
+            roboRight = texture("images/chars/robo_right.png");
+            roboLeft = texture("images/chars/robo_left.png");
+            roboUp = texture("images/chars/robo_up.png");
+            roboError = texture("images/chars/robo_error.png");
+            roboWin = texture("images/chars/robo_win.png");
+            guidePortrait = texture("images/chars/robo_idle.png");
         }
     }
 
@@ -276,11 +366,24 @@ public class RoboCodeGameScreen extends ScreenAdapter {
     }
 
     private void loadLevel() {
+        GameState.setCurrentLevelIndex(currentLevelIndex);
         LevelData level = currentLevel();
+        mapRows = level.rows.length;
+        mapCols = level.rows[0].length();
+        cellSize = Math.min(SpaceTheme.BOARD_FRAME_W / mapCols, SpaceTheme.BOARD_FRAME_H / mapRows);
+        boardX = SpaceTheme.BOARD_FRAME_X + (SpaceTheme.BOARD_FRAME_W - mapCols * cellSize) / 2f;
+        boardY = SpaceTheme.BOARD_FRAME_Y + (SpaceTheme.BOARD_FRAME_H - mapRows * cellSize) / 2f;
         shipRow = -1;
         shipCol = -1;
-        for (int r = 0; r < ROWS; r++) {
-            for (int c = 0; c < COLS; c++) {
+        shipDestRow = -1;
+        shipDestCol = -1;
+        for (int r = 0; r < MAX_MAP_ROWS; r++) {
+            for (int c = 0; c < MAX_MAP_COLS; c++) {
+                map[r][c] = '#';
+            }
+        }
+        for (int r = 0; r < mapRows; r++) {
+            for (int c = 0; c < mapCols; c++) {
                 char ch = level.rows[r].charAt(c);
                 if (ch == 'S') {
                     startRow = r;
@@ -293,6 +396,10 @@ public class RoboCodeGameScreen extends ScreenAdapter {
                 } else if (ch == 'N') {
                     shipRow = r;
                     shipCol = c;
+                    map[r][c] = '.';
+                } else if (ch == 'T') {
+                    shipDestRow = r;
+                    shipDestCol = c;
                     map[r][c] = '.';
                 } else {
                     map[r][c] = ch;
@@ -323,6 +430,7 @@ public class RoboCodeGameScreen extends ScreenAdapter {
         shipBoarded = false;
         running = false;
         showFailModal = false;
+        failGameOver = false;
         showWinModal = false;
         executionIndex = 0;
         activeProgramIndex = -1;
@@ -330,8 +438,12 @@ public class RoboCodeGameScreen extends ScreenAdapter {
         executionQueue.clear();
         executionSourceIndexes.clear();
         coinsCollected = 0;
-        for (int i = 0; i < collectedCoins.length; i++) {
-            collectedCoins[i] = false;
+        if (collectedCoins.length < coins.size()) {
+            collectedCoins = new boolean[coins.size()];
+        } else {
+            for (int i = 0; i < coins.size(); i++) {
+                collectedCoins[i] = false;
+            }
         }
         robotX = cellCenterX(robotCol);
         robotY = cellCenterY(robotRow);
@@ -341,6 +453,57 @@ public class RoboCodeGameScreen extends ScreenAdapter {
         robotToY = robotY;
         moveTimer = MOVE_TIME;
         rebuildPreview();
+        applyLevelIntroStatus();
+    }
+
+    private void applyLevelIntroStatus() {
+        if (currentLevelIndex == 2 && levelRequiresShip()) {
+            status = "Laberinto grande: baja a NAVE, teleporta y sube a META.";
+        } else if (isShipTutorialLevel()) {
+            status = "Tutorial nave: cruza el vacio con usar nave y llega a META.";
+        }
+    }
+
+    private boolean isShipTutorialLevel() {
+        return currentLevelIndex >= 1 && levelRequiresShip();
+    }
+
+    private String shipLevelTutorialMessage() {
+        if (program.isEmpty()) {
+            if (currentLevelIndex >= 2) {
+                return "Laberinto estelar: baja a NAVE, usa nave, sube a META.";
+            }
+            return "Cruza el vacio azul: llega a NAVE y usa el bloque usar nave.";
+        }
+        if (!program.contains(Command.USE_SHIP)) {
+            return "Pon usar nave cuando estes encima de la plataforma NAVE.";
+        }
+        if (!program.contains(Command.COLLECT_STAR) && !allCoinsCollected()) {
+            return "Recoge estrellas (+15 cred.) con recoger estrella.";
+        }
+        return "Listo! Pulsa Ejecutar.";
+    }
+
+    private String shipLevelMapHint() {
+        if (program.isEmpty()) {
+            return "Camino marron → NAVE → usar nave";
+        }
+        if (!program.contains(Command.USE_SHIP)) {
+            return "Entra a la casilla NAVE por el camino";
+        }
+        if (!program.contains(Command.COLLECT_STAR) && !allCoinsCollected()) {
+            return "Recoge las estrellas del camino";
+        }
+        return "¡Vamos! Sigue las flechas";
+    }
+
+    private boolean shouldShowShipLevelTutorial() {
+        if (!isShipTutorialLevel() || running || showWinModal || showFailModal) {
+            return false;
+        }
+        return program.isEmpty()
+                || !program.contains(Command.USE_SHIP)
+                || (!allCoinsCollected() && !program.contains(Command.COLLECT_STAR));
     }
 
     private void setupInput() {
@@ -370,14 +533,25 @@ public class RoboCodeGameScreen extends ScreenAdapter {
         }
         if (showFailModal) {
             if (failRetryButton.contains(x, y)) {
-                showFailModal = false;
-                clearProgram();
-                resetRobotAndRewards();
-                status = "Nuevo intento: crea otra secuencia.";
+                if (failGameOver) {
+                    restartCampaignAfterGameOver();
+                } else {
+                    showFailModal = false;
+                    failGameOver = false;
+                    clearProgram();
+                    resetRobotAndRewards();
+                    status = "Sigue en el nivel " + (currentLevelIndex + 1)
+                            + ". Te quedan " + GameState.lives() + " vidas.";
+                }
             } else if (failEditButton.contains(x, y)) {
-                showFailModal = false;
-                resetRobotAndRewards();
-                status = "Edita tu algoritmo y vuelve a ejecutar.";
+                if (failGameOver) {
+                    goToMenu();
+                } else {
+                    showFailModal = false;
+                    failGameOver = false;
+                    resetRobotAndRewards();
+                    status = "Edita tu algoritmo. Te quedan " + GameState.lives() + " vidas.";
+                }
             } else if (failMenuButton.contains(x, y)) {
                 goToMenu();
             }
@@ -395,31 +569,51 @@ public class RoboCodeGameScreen extends ScreenAdapter {
             status = "Codigo expandido con explicacion.";
             return;
         }
-        if (menuButton.contains(x, y)) {
+        if (topHudRenderer.menuButton().contains(x, y)) {
             goToMenu();
             return;
         }
-        if (runButton.contains(x, y)) {
+        if (topHudRenderer.lifePill().contains(x, y) || footerHudRenderer.buyLifeBadge().contains(x, y)) {
+            tryBuyLife();
+            return;
+        }
+        if (topHudRenderer.coinPill().contains(x, y)) {
+            showCreditsInfo();
+            return;
+        }
+        if (topHudRenderer.starPill().contains(x, y)) {
+            showStarsInfo();
+            return;
+        }
+        if (footerHudRenderer.achievementsBadge().contains(x, y)) {
+            showAchievementsInfo();
+            return;
+        }
+        if (footerHudRenderer.robotsBadge().contains(x, y)) {
+            showRobotsInfo();
+            return;
+        }
+        if (actionButtonsRenderer.runButton().contains(x, y)) {
             startRun();
             return;
         }
-        if (stepButton.contains(x, y)) {
+        if (actionButtonsRenderer.stepButton().contains(x, y)) {
             stepOnce();
             return;
         }
-        if (pauseButton.contains(x, y)) {
+        if (actionButtonsRenderer.pauseButton().contains(x, y)) {
             pauseRun();
             return;
         }
-        if (undoButton.contains(x, y)) {
+        if (actionButtonsRenderer.undoButton().contains(x, y)) {
             undoProgram();
             return;
         }
-        if (clearButton.contains(x, y)) {
+        if (actionButtonsRenderer.clearButton().contains(x, y)) {
             clearProgram();
             return;
         }
-        if (resetButton.contains(x, y)) {
+        if (actionButtonsRenderer.resetButton().contains(x, y)) {
             resetRobotAndRewards();
             status = characterName() + " volvio al inicio. Flechas del mapa actualizadas.";
             return;
@@ -449,13 +643,78 @@ public class RoboCodeGameScreen extends ScreenAdapter {
         activeProgramIndex = -1;
         if (hasNextLevel()) {
             currentLevelIndex++;
+            GameState.setCurrentLevelIndex(currentLevelIndex);
             loadLevel();
-            status = currentLevel().title + ": llega a la nave y usa el bloque correcto.";
+            if (isShipTutorialLevel()) {
+                status = "Nivel 2: aprende a usar la nave y el teleport.";
+            } else {
+                status = "Nivel " + (currentLevelIndex + 1) + ": " + currentLevel().title
+                        + ". Te quedan " + GameState.lives() + " vidas.";
+            }
             return;
         }
         resetRobotAndRewards();
         rebuildPreview();
         status = "Nuevo reto: arma otra solucion.";
+    }
+
+    private void restartCampaignAfterGameOver() {
+        GameState.resetAfterGameOver();
+        currentLevelIndex = 0;
+        showFailModal = false;
+        failGameOver = false;
+        program.clear();
+        executionQueue.clear();
+        executionSourceIndexes.clear();
+        loadLevel();
+        status = "Nueva aventura desde el nivel 1. Tienes 3 vidas.";
+    }
+
+    private void tryBuyLife() {
+        if (GameState.buyLife()) {
+            status = "Compraste 1 vida por " + GameState.LIFE_COST + " creditos. Te quedan "
+                    + GameState.lives() + " vidas.";
+            mood = RobotMood.IDLE;
+            return;
+        }
+        if (GameState.lives() >= GameState.MAX_LIVES) {
+            status = "Ya tienes el maximo de vidas (" + GameState.MAX_LIVES + ").";
+            return;
+        }
+        status = "Necesitas " + GameState.LIFE_COST + " creditos (tienes " + GameState.sessionCoins()
+                + "). Recoge estrellas: +" + GameState.CREDITS_PER_STAR + " cada una.";
+        mood = RobotMood.IDLE;
+    }
+
+    private void showCreditsInfo() {
+        status = "Creditos: " + GameState.sessionCoins()
+                + ". Estrella = +" + GameState.CREDITS_PER_STAR
+                + ". Vida = " + GameState.LIFE_COST + " (toca corazon o cofre).";
+        mood = RobotMood.IDLE;
+    }
+
+    private void showStarsInfo() {
+        status = "Estrellas recogidas: " + GameState.starsEarned() + "/" + GameState.maxStars()
+                + ". Cada una suma +" + GameState.CREDITS_PER_STAR + " creditos.";
+        mood = RobotMood.IDLE;
+    }
+
+    private void showAchievementsInfo() {
+        status = "Logros desbloqueados: " + GameState.achievementCount()
+                + ". Completa niveles y recoge todas las estrellas.";
+        mood = RobotMood.IDLE;
+    }
+
+    private void showRobotsInfo() {
+        String monoStatus = GameState.isMonoUnlocked()
+                ? "Mono desbloqueado."
+                : "Mono: " + GameState.MONO_COST + " cred. para desbloquear.";
+        status = "Robo (gratis). " + monoStatus + " Pirata (gratis). Activo: " + characterName() + ".";
+        mood = RobotMood.IDLE;
+    }
+
+    private int sessionCreditsPreview() {
+        return GameState.sessionCoins() + GameState.creditsForStars(coinsCollected);
     }
 
     private void goToMenu() {
@@ -486,6 +745,10 @@ public class RoboCodeGameScreen extends ScreenAdapter {
             status = "Flecha en el mapa: hacia " + directionLabel(previewFacing) + ".";
         } else if (command == Command.FORWARD) {
             status = "Sigue las flechas blancas del camino azul.";
+        } else if (command == Command.USE_SHIP && isShipTutorialLevel()) {
+            status = "Perfecto: usar nave solo funciona cuando estoy encima de la NAVE.";
+        } else if (command == Command.COLLECT_STAR && isShipTutorialLevel()) {
+            status = "Recuerda: recoger estrella solo funciona parado sobre una estrella.";
         } else {
             status = "Bloque agregado: " + command.label + ".";
         }
@@ -514,15 +777,20 @@ public class RoboCodeGameScreen extends ScreenAdapter {
     }
 
     private int programIndexAt(float x, float y) {
-        float blockX = PROGRAM_X + 18f;
-        float blockY = PROGRAM_Y + PROGRAM_H - 78f;
-        for (int i = 0; i < program.size(); i++) {
-            Rectangle r = new Rectangle(blockX, blockY - i * 34f, PROGRAM_W - 36f, 28f);
-            if (r.contains(x, y)) {
-                return i;
-            }
+        return programPanelRenderer.programIndexAt(x, y);
+    }
+
+    private void rebuildProgramViews() {
+        programViews.clear();
+        for (Command command : program) {
+            programViews.add(new ProgramPanelRenderer.ProgramCommandView(
+                    command.label,
+                    command.paletteIcon(),
+                    programColor(command, 0.92f),
+                    command.isRepeatable(),
+                    command == Command.REPEAT_PREVIOUS));
         }
-        return -1;
+        programPanelRenderer.rebuildLayout(programViews, activeProgramIndex);
     }
 
     private void startRun() {
@@ -620,10 +888,18 @@ public class RoboCodeGameScreen extends ScreenAdapter {
             if (robotRow == shipRow && robotCol == shipCol) {
                 usingShip = true;
                 shipBoarded = true;
-                status = characterName() + " activo la nave espacial.";
+                if (hasTeleportShip()) {
+                    teleportRobotTo(shipDestRow, shipDestCol);
+                    status = characterName() + " uso la nave y se teleporto al otro lado del vacio!";
+                } else {
+                    status = characterName() + " activo la nave espacial.";
+                }
                 mood = RobotMood.IDLE;
             } else {
-                triggerFail("La nave no esta en esta casilla.", "Llega a la plataforma de nave y luego usa el bloque usar nave.");
+                triggerFail("La nave no esta en esta casilla.",
+                        hasTeleportShip()
+                                ? "Llega a la plataforma NAVE y usa el bloque usar nave para teleportarte."
+                                : "Llega a la plataforma de nave y luego usa el bloque usar nave.");
             }
             return;
         }
@@ -691,7 +967,11 @@ public class RoboCodeGameScreen extends ScreenAdapter {
 
     private String successMessage() {
         if (program.contains(Command.USE_SHIP)) {
-            return "Excelente! Activaste la nave y recogiste las estrellas necesarias.";
+            if (coinsCollected > 0) {
+                return "Excelente! Usaste la nave y recogiste " + coinsCollected + " estrella"
+                        + (coinsCollected == 1 ? "" : "s") + ".";
+            }
+            return "Excelente! Usaste la nave para cruzar el vacio.";
         }
         if (program.contains(Command.REPEAT_PREVIOUS)) {
             return "Excelente! Usaste un bucle para llegar a la meta.";
@@ -699,8 +979,12 @@ public class RoboCodeGameScreen extends ScreenAdapter {
         if (program.contains(Command.IF_WALL) || program.contains(Command.IF_PATH_FREE)) {
             return "Muy bien! Tus condiciones guiaron bien a " + characterName() + ".";
         }
-        if (!coins.isEmpty() && program.contains(Command.COLLECT_STAR)) {
-            return "Muy bien! Recogiste las estrellas con el bloque correcto.";
+        if (coinsCollected > 0 && program.contains(Command.COLLECT_STAR)) {
+            return "Muy bien! Recogiste " + coinsCollected + " estrella"
+                    + (coinsCollected == 1 ? "" : "s") + " del mapa.";
+        }
+        if (!coins.isEmpty() && coinsCollected == 0) {
+            return "Llegaste a la meta. Intenta recoger estrellas para ganar creditos.";
         }
         return "Muy bien! Creaste una secuencia correcta.";
     }
@@ -712,15 +996,21 @@ public class RoboCodeGameScreen extends ScreenAdapter {
         showCodeModal = false;
         showFailModal = false;
         showWinModal = true;
-        stars = computeStarRating();
+        levelRating = computeStarRating();
+        lastCreditsEarned = GameState.creditsForStars(coinsCollected);
         winLesson = program.contains(Command.USE_SHIP)
                 ? "Combinaste caminar, activar nave y seguir la ruta."
                 : program.contains(Command.REPEAT_PREVIOUS)
                 ? "Usaste un bucle para ahorrar instrucciones."
                 : program.contains(Command.IF_WALL) || program.contains(Command.IF_PATH_FREE)
                 ? "Usaste condiciones para decidir cuando avanzar o girar."
+                : coinsCollected == 0 && !coins.isEmpty()
+                ? "Cada estrella vale " + GameState.CREDITS_PER_STAR + " creditos. Una vida cuesta "
+                + GameState.LIFE_COST + "."
                 : "Ordenaste una secuencia que llega a la meta.";
         status = successMessage();
+        GameState.addCoins(lastCreditsEarned);
+        GameState.addStars(coinsCollected);
     }
 
     private void tryCompleteLevel() {
@@ -731,7 +1021,9 @@ public class RoboCodeGameScreen extends ScreenAdapter {
         if (levelRequiresShip() && !shipBoarded) {
             triggerFail(
                     "Llegaste cerca, pero este nivel necesita la nave.",
-                    "Usa el bloque usar nave en la plataforma antes de cruzar el vacio.");
+                    hasTeleportShip()
+                            ? "Sube a la NAVE, usa usar nave para teleportarte y luego llega a la META."
+                            : "Usa el bloque usar nave en la plataforma antes de cruzar el vacio.");
             return;
         }
         triggerWin();
@@ -765,6 +1057,22 @@ public class RoboCodeGameScreen extends ScreenAdapter {
             }
         }
         return false;
+    }
+
+    private boolean hasTeleportShip() {
+        return shipDestRow >= 0 && shipDestCol >= 0;
+    }
+
+    private void teleportRobotTo(int row, int col) {
+        robotFromX = robotX;
+        robotFromY = robotY;
+        robotRow = row;
+        robotCol = col;
+        robotToX = cellCenterX(col);
+        robotToY = cellCenterY(row);
+        robotX = robotToX;
+        robotY = robotToY;
+        moveTimer = MOVE_TIME;
     }
 
     private boolean levelRequiresShip() {
@@ -802,11 +1110,21 @@ public class RoboCodeGameScreen extends ScreenAdapter {
         showFailModal = true;
         failReason = reason;
         failAdvice = advice;
-        status = reason;
+        int remaining = GameState.loseLife();
+        failGameOver = remaining <= 0;
+        if (failGameOver) {
+            failLivesMessage = "Se acabaron tus vidas. Vuelves al nivel 1 con 3 vidas nuevas.";
+            status = "Sin vidas. Reinicia la aventura desde el principio.";
+        } else {
+            failLivesMessage = "Te quedan " + remaining + " "
+                    + (remaining == 1 ? "vida" : "vidas")
+                    + ". Sigue en el nivel " + (currentLevelIndex + 1) + ".";
+            status = failLivesMessage;
+        }
     }
 
     private String characterName() {
-        return GameState.selectedCharacter() == PlayerCharacter.MONO_ESPACIAL ? "Mono espacial" : "Robo";
+        return GameState.selectedCharacter().displayName;
     }
 
     private void collectCoinIfNeeded() {
@@ -814,6 +1132,7 @@ public class RoboCodeGameScreen extends ScreenAdapter {
             if (!collectedCoins[i] && coins.get(i).row == robotRow && coins.get(i).col == robotCol) {
                 collectedCoins[i] = true;
                 coinsCollected++;
+                starCollectAnimator.spawn(cellCenterX(coins.get(i).col), cellCenterY(coins.get(i).row));
             }
         }
     }
@@ -900,6 +1219,12 @@ public class RoboCodeGameScreen extends ScreenAdapter {
         if (command == Command.USE_SHIP) {
             if (cursor.row == shipRow && cursor.col == shipCol) {
                 cursor.usingShip = true;
+                if (hasTeleportShip()) {
+                    cursor.row = shipDestRow;
+                    cursor.col = shipDestCol;
+                    previewPath.add(new CellPoint(cursor.row, cursor.col));
+                    previewSteps.add(new PathStep(cursor.row, cursor.col, cursor.facing, Command.USE_SHIP));
+                }
             }
             return;
         }
@@ -935,13 +1260,17 @@ public class RoboCodeGameScreen extends ScreenAdapter {
         Gdx.gl.glEnable(GL20.GL_BLEND);
         Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
 
-        drawBackground();
-        drawSidePanels();
+        themeRenderer.drawBackground(batch, sr, time);
+        blockPalettePanelRenderer.renderBackground(batch, sr, time);
+        rebuildProgramViews();
+        drawPaletteBlocks();
         drawBoardPanel();
-        drawLearningPanels();
-        drawRightButtons();
-        drawTopBar();
+        drawProgramPanel();
+        actionButtonsRenderer.render(batch, sr, time, running);
         drawTextLayer();
+        HudState hud = buildHudState();
+        topHudRenderer.render(sr, batch, hud, time);
+        footerHudRenderer.render(sr, batch, hud, guidePortrait, themeAssets.roboMini, time);
         if (showCodeModal) {
             drawCodeModal();
         }
@@ -955,6 +1284,7 @@ public class RoboCodeGameScreen extends ScreenAdapter {
 
     private void update(float delta) {
         time += delta;
+        starCollectAnimator.update(delta);
         if (moveTimer < MOVE_TIME) {
             moveTimer = Math.min(MOVE_TIME, moveTimer + delta);
             float alpha = Interpolation.sineOut.apply(moveTimer / MOVE_TIME);
@@ -1015,80 +1345,125 @@ public class RoboCodeGameScreen extends ScreenAdapter {
         sr.end();
     }
 
-    private void drawSidePanels() {
-        sr.begin(ShapeRenderer.ShapeType.Filled);
-        drawRoundRect(LEFT_X + 5, SIDE_TOP_Y - 8, LEFT_W, SIDE_H, 16, new Color(0f, 0.02f, 0.10f, 0.36f));
-        drawRoundRect(LEFT_X, SIDE_TOP_Y, LEFT_W, SIDE_H, 16, new Color(0.03f, 0.10f, 0.30f, 0.84f));
-        drawRoundRect(LEFT_X + 10, SIDE_TOP_Y + 10, LEFT_W - 20, SIDE_H - 20, 14, new Color(0.05f, 0.22f, 0.46f, 0.52f));
-        drawRoundRect(LEFT_X, SIDE_TOP_Y + SIDE_H - 52, LEFT_W, 52, 16, PURPLE);
-        sr.setColor(CYAN);
-        sr.rect(LEFT_X + 18, SIDE_TOP_Y + SIDE_H - 12, LEFT_W - 36, 4);
-
-        for (CommandButton item : palette) {
-            drawCommandBlock(item.rect, item.color);
-            drawCommandIcon(item);
-        }
-        sr.end();
+    private HudState buildHudState() {
+        LevelData level = currentLevel();
+        String title = level.title;
+        int colon = title.indexOf(':');
+        String missionTitle = colon >= 0 ? title.substring(colon + 1).trim() : title;
+        return new HudState(
+                currentLevelIndex + 1,
+                missionTitle,
+                level.goal,
+                GameState.starsEarned(),
+                GameState.maxStars(),
+                sessionCreditsPreview(),
+                GameState.lives(),
+                roboDialogueMessage(),
+                characterName(),
+                GameState.achievementCount(),
+                GameState.robotsUnlocked(),
+                GameState.creditsForStars(coinsCollected),
+                GameState.LIFE_COST,
+                GameState.canBuyLife());
     }
 
-    private void drawProgramChipShapes() {
+    private String mapSpeechMessage() {
+        if (running || showWinModal || showFailModal) {
+            return "";
+        }
+        if (isShipTutorialLevel()) {
+            return shipLevelMapHint();
+        }
         if (program.isEmpty()) {
-            drawRoundRect(PROGRAM_X + 22, PROGRAM_Y + 34, PROGRAM_W - 44, 54, 16, new Color(0.66f, 0.84f, 1f, 0.18f));
-            return;
+            return "¡Vamos! Recolectemos estrellas";
         }
-        float blockX = PROGRAM_X + 18f;
-        float blockY = PROGRAM_Y + PROGRAM_H - 78f;
-        for (int i = 0; i < program.size(); i++) {
-            float y = blockY - i * 34f;
-            if (y < PROGRAM_Y + 12f) {
-                break;
-            }
-            Command c = program.get(i);
-            if (i == activeProgramIndex) {
-                drawRoundRect(blockX - 4f, y - 5f, PROGRAM_W - 28f, 34f, 12, new Color(1f, 0.88f, 0.14f, 0.32f));
-            }
-            drawRoundRect(blockX, y - 3f, PROGRAM_W - 36f, 28f, 10, new Color(0f, 0.03f, 0.14f, 0.34f));
-            drawRoundRect(blockX, y, PROGRAM_W - 36f, 28f, 10, programColor(c, 0.92f));
-            sr.setColor(1f, 1f, 1f, 0.32f);
-            sr.rect(blockX + 8f, y + 22f, PROGRAM_W - 52f, 3f);
-        }
+        return "";
     }
 
-    private void drawLearningPanels() {
-        sr.begin(ShapeRenderer.ShapeType.Filled);
-        drawRoundRect(PROGRAM_X + 5, PROGRAM_Y - 7, PROGRAM_W, PROGRAM_H, 18, new Color(0f, 0.02f, 0.10f, 0.38f));
-        drawRoundRect(PROGRAM_X, PROGRAM_Y, PROGRAM_W, PROGRAM_H, 18, new Color(0.03f, 0.12f, 0.30f, 0.90f));
-        drawRoundRect(PROGRAM_X, PROGRAM_Y + PROGRAM_H - 44, PROGRAM_W, 44, 18, new Color(0.17f, 0.39f, 0.95f, 0.95f));
-        drawPanelEdge(PROGRAM_X, PROGRAM_Y, PROGRAM_W, PROGRAM_H, 18);
-        drawProgramChipShapes();
-        drawCodePanelFrame();
-        sr.end();
+    private String roboDialogueMessage() {
+        if (showWinModal) {
+            return successMessage();
+        }
+        if (showFailModal) {
+            return failGameOver
+                    ? "Sin vidas... pero aprendimos algo. Reiniciemos la aventura."
+                    : failLivesMessage;
+        }
+        if (running) {
+            return "Ejecutando tu programa paso a paso...";
+        }
+        if (shouldShowShipLevelTutorial()) {
+            return shipLevelTutorialMessage();
+        }
+        if (program.isEmpty()) {
+            return isShipTutorialLevel()
+                    ? "Camino marron → NAVE → usar nave."
+                    : "Arma tu programa con bloques y recoge estrellas.";
+        }
+        return status;
+    }
+
+    private void drawPaletteBlocks() {
+        batch.begin();
+        for (CommandButton item : palette) {
+            blockPalettePanelRenderer.renderPaletteBlock(batch, item.rect, item.icon, item.label, smallFont);
+        }
+        batch.end();
+        blockPalettePanelRenderer.renderCategoryLabels(batch, smallFont);
+    }
+
+    private void drawProgramPanel() {
+        programPanelRenderer.renderBackground(batch, sr);
+        programPanelRenderer.renderChips(batch, viewport.getCamera(), programViews);
+        programPanelRenderer.renderChipLabels(batch, viewport.getCamera());
+        programPanelRenderer.renderCodeButton(batch, expandCodeButton);
     }
 
     private void drawBoardPanel() {
+        gameBoardRenderer.renderFrame(batch, sr, time);
+        gameBoardRenderer.renderGridTiles(batch, map, mapRows, mapCols, boardX, boardY, cellSize);
+        gameBoardRenderer.renderGridProps(batch, map, mapRows, mapCols, boardX, boardY, cellSize, time);
+
         sr.begin(ShapeRenderer.ShapeType.Filled);
-        drawRoundRect(300, 90, 520, 548, 30, new Color(0f, 0.02f, 0.10f, 0.36f));
-        drawRoundRect(300, 98, 520, 532, 30, new Color(0.01f, 0.08f, 0.25f, 0.72f));
-        drawRoundRect(314, 112, 492, 500, 24, new Color(0.04f, 0.22f, 0.36f, 0.76f));
-        drawRoundRect(322, 120, 476, 484, 18, new Color(0.08f, 0.36f, 0.42f, 0.42f));
-        drawPanelEdge(300, 98, 520, 532, 30);
-        drawPanelEdge(314, 112, 492, 500, 24);
-        drawGrid();
         drawPreviewRoute();
-        drawCoins();
-        drawStartAndGoal();
         sr.end();
+
+        drawStartAndGoal();
+        drawCoins();
+        for (StarCollectAnimator.Burst burst : starCollectAnimator.bursts()) {
+            gameBoardRenderer.renderStarCollectBurst(batch, sr, burst.x, burst.y, burst.progress(), YELLOW);
+        }
 
         drawShipOnBoard();
         if (!running && !program.isEmpty()) {
             drawMapGuideOverlay();
         }
         drawRobotOnBoard();
+        String mapBubble = mapSpeechMessage();
+        mapSpeechBubbleRenderer.render(batch, robotX, robotY, mapBubble, time, !mapBubble.isEmpty());
         drawRobotDirectionBadge();
+        drawGoalMarker();
+    }
+
+    private void drawGoalMarker() {
+        float gx = cellCenterX(goalCol);
+        float gy = cellCenterY(goalRow);
+        float pulse = 0.92f + MathUtils.sin(time * 2.4f) * 0.08f;
+        float bob = MathUtils.sin(time * 2.2f) * 3f;
+        batch.begin();
+        batch.setColor(1f, 0.95f, 0.45f, 0.35f * pulse);
+        float glow = 52f * pulse;
+        batch.draw(themeAssets.starGlow, gx - glow / 2f, gy - glow / 2f + bob, glow, glow);
+        batch.setColor(Color.WHITE);
+        float trophy = 40f * pulse;
+        batch.draw(themeAssets.iconTrophyGold, gx - trophy / 2f, gy - trophy / 2f + bob, trophy, trophy);
+        batch.draw(themeAssets.labelMeta, gx - 34f, gy + 22f + bob, 68f, 24f);
+        batch.end();
     }
 
     private void drawMapGuideOverlay() {
-        sr.begin(ShapeRenderer.ShapeType.Filled);
+        batch.begin();
+        batch.setColor(Color.WHITE);
         for (int i = 1; i < previewSteps.size(); i++) {
             PathStep step = previewSteps.get(i);
             if (step.row == robotRow && step.col == robotCol) {
@@ -1096,16 +1471,20 @@ public class RoboCodeGameScreen extends ScreenAdapter {
             }
             drawCellDirectionArrow(step.row, step.col, step.facing);
         }
-        sr.end();
+        batch.end();
     }
 
     private void drawCellDirectionArrow(int row, int col, Direction direction) {
         float cx = cellCenterX(col);
         float cy = cellCenterY(row);
-        sr.setColor(0.06f, 0.28f, 0.62f, 0.72f);
-        sr.circle(cx, cy, 17f);
-        sr.setColor(1f, 1f, 1f, 0.95f);
-        drawDirectionArrow(cx, cy, direction, WHITE, 15f, false);
+        float rotation = switch (direction) {
+            case RIGHT -> 0f;
+            case UP -> 90f;
+            case LEFT -> 180f;
+            case DOWN -> 270f;
+        };
+        batch.draw(new TextureRegion(themeAssets.pathArrowPreview),
+                cx - 17f, cy - 17f, 17f, 17f, 34f, 34f, 1f, 1f, rotation);
     }
 
     private void drawRobotDirectionBadge() {
@@ -1119,18 +1498,6 @@ public class RoboCodeGameScreen extends ScreenAdapter {
         sr.end();
     }
 
-    private void drawCodePanelFrame() {
-        drawRoundRect(CODE_X + 5, CODE_Y - 7, CODE_W, CODE_H, 18, new Color(0f, 0.02f, 0.10f, 0.38f));
-        drawRoundRect(CODE_X, CODE_Y, CODE_W, CODE_H, 18, new Color(0.01f, 0.07f, 0.20f, 0.88f));
-        drawRoundRect(CODE_X + 10, CODE_Y + 10, CODE_W - 20, CODE_H - 20, 14, new Color(0.03f, 0.18f, 0.36f, 0.48f));
-        drawPanelEdge(CODE_X, CODE_Y, CODE_W, CODE_H, 18);
-        sr.setColor(0.20f, 0.90f, 1f, 0.16f + MathUtils.sin(time * 2.2f) * 0.05f);
-        sr.rect(CODE_X + 16, CODE_Y + CODE_H - 68, CODE_W - 32, 2);
-        drawRoundRect(expandCodeButton.x, expandCodeButton.y, expandCodeButton.width, expandCodeButton.height, 12, new Color(0.05f, 0.42f, 0.92f, 0.92f));
-        sr.setColor(0.42f, 0.96f, 1f, 0.85f);
-        sr.rect(expandCodeButton.x + 10f, expandCodeButton.y + expandCodeButton.height - 6f, expandCodeButton.width - 20f, 3f);
-    }
-
     private void drawPanelEdge(float x, float y, float w, float h, float radius) {
         sr.setColor(CYAN.r, CYAN.g, CYAN.b, 0.42f);
         sr.rect(x + radius, y + h - 3f, w - 2f * radius, 3f);
@@ -1140,33 +1507,33 @@ public class RoboCodeGameScreen extends ScreenAdapter {
     }
 
     private void drawGrid() {
-        for (int r = 0; r < ROWS; r++) {
-            for (int c = 0; c < COLS; c++) {
-                float x = BOARD_X + c * CELL;
-                float y = BOARD_Y + (ROWS - 1 - r) * CELL;
+        for (int r = 0; r < mapRows; r++) {
+            for (int c = 0; c < mapCols; c++) {
+                float x = boardX + c * cellSize;
+                float y = boardY + (mapRows - 1 - r) * cellSize;
                 if (map[r][c] == '#') {
                     sr.setColor(0f, 0.02f, 0.08f, 0.28f);
-                    drawRoundRect(x + 3, y + 1, CELL - 6, CELL - 6, 5, new Color(0f, 0.02f, 0.08f, 0.28f));
-                    drawRoundRect(x + 4, y + 4, CELL - 8, CELL - 8, 6, GRASS_DARK);
-                    drawRoundRect(x + 7, y + 9, CELL - 14, CELL - 13, 5, GRASS);
+                    drawRoundRect(x + 3, y + 1, cellSize - 6, cellSize - 6, 5, new Color(0f, 0.02f, 0.08f, 0.28f));
+                    drawRoundRect(x + 4, y + 4, cellSize - 8, cellSize - 8, 6, GRASS_DARK);
+                    drawRoundRect(x + 7, y + 9, cellSize - 14, cellSize - 13, 5, GRASS);
                     sr.setColor(0.56f, 0.96f, 0.25f, 0.88f);
-                    sr.rect(x + 10, y + CELL - 12, CELL - 20, 4);
+                    sr.rect(x + 10, y + cellSize - 12, cellSize - 20, 4);
                 } else if (isFlightTile(r, c)) {
-                    drawRoundRect(x + 3, y + 3, CELL - 6, CELL - 6, 5, new Color(0.04f, 0.08f, 0.28f, 0.96f));
+                    drawRoundRect(x + 3, y + 3, cellSize - 6, cellSize - 6, 5, new Color(0.04f, 0.08f, 0.28f, 0.96f));
                     sr.setColor(0.10f, 0.74f, 0.96f, 0.20f + MathUtils.sin(time * 2.4f + r + c) * 0.05f);
-                    sr.circle(x + CELL / 2f, y + CELL / 2f, 18f);
+                    sr.circle(x + cellSize / 2f, y + cellSize / 2f, cellSize * 0.38f);
                     sr.setColor(0.64f, 0.96f, 1f, 0.56f);
-                    sr.rect(x + 10f, y + CELL - 13f, CELL - 20f, 3f);
+                    sr.rect(x + 10f, y + cellSize - 13f, cellSize - 20f, 3f);
                     sr.setColor(0.42f, 0.22f, 0.92f, 0.46f);
-                    sr.rect(x + 9f, y + 9f, CELL - 18f, 2f);
+                    sr.rect(x + 9f, y + 9f, cellSize - 18f, 2f);
                 } else {
-                    drawRoundRect(x + 3, y + 3, CELL - 6, CELL - 6, 5, new Color(0.94f, 0.82f, 0.55f, 0.94f));
+                    drawRoundRect(x + 3, y + 3, cellSize - 6, cellSize - 6, 5, new Color(0.94f, 0.82f, 0.55f, 0.94f));
                     sr.setColor(SAND);
-                    sr.rect(x + 7, y + 7, CELL - 14, CELL - 14);
+                    sr.rect(x + 7, y + 7, cellSize - 14, cellSize - 14);
                     sr.setColor(0.04f, 0.32f, 0.45f, 0.18f);
-                    sr.rect(x + 8, y + 8, CELL - 16, 2);
+                    sr.rect(x + 8, y + 8, cellSize - 16, 2);
                     sr.setColor(1f, 1f, 1f, 0.20f);
-                    sr.rect(x + 8, y + CELL - 10, CELL - 16, 2);
+                    sr.rect(x + 8, y + cellSize - 10, cellSize - 16, 2);
                 }
             }
         }
@@ -1229,111 +1596,24 @@ public class RoboCodeGameScreen extends ScreenAdapter {
             CellPoint p = coins.get(i);
             float x = cellCenterX(p.col);
             float y = cellCenterY(p.row);
-            float pulse = 1f + MathUtils.sin(time * 2.6f + i) * 0.10f;
-            sr.setColor(1f, 0.76f, 0.08f, 0.22f);
-            sr.circle(x, y, 22f * pulse);
-            sr.setColor(1f, 0.64f, 0.03f, 1f);
-            sr.circle(x, y, 16f * pulse);
-            sr.setColor(YELLOW);
-            sr.circle(x, y, 11f * pulse);
-            drawStar(x, y, 7.5f * pulse, new Color(1f, 0.96f, 0.62f, 1f));
+            float pulse = 1f + MathUtils.sin(time * 2.6f + i) * 0.14f;
+            gameBoardRenderer.renderStar(batch, sr, x, y, new Color(1f, 0.96f, 0.62f, 1f), pulse, time, i);
         }
     }
 
     private void drawStartAndGoal() {
         float sx = cellCenterX(startCol);
         float sy = cellCenterY(startRow);
-        sr.setColor(0.25f, 0.76f, 0.20f, 1f);
-        drawRoundRect(sx - 42, sy - 40, 84, 26, 8, GREEN);
-
-        float gx = cellCenterX(goalCol);
-        float gy = cellCenterY(goalRow);
-        sr.setColor(1f, 0.23f, 0.16f, 1f);
-        drawRoundRect(gx - 42, gy - 44, 84, 28, 8, new Color(0.92f, 0.24f, 0.14f, 1f));
-        sr.setColor(1f, 0.78f, 0.12f, 1f);
-        sr.rect(gx - 8, gy - 4, 7, 42);
-        sr.setColor(1f, 0.26f, 0.14f, 1f);
-        sr.triangle(gx - 1, gy + 34, gx + 35, gy + 24, gx - 1, gy + 14);
-        sr.setColor(1f, 0.86f, 0.12f, 0.22f + MathUtils.sin(time * 2.4f) * 0.06f);
-        sr.circle(gx, gy, 30);
-        sr.setColor(YELLOW);
-        sr.circle(gx, gy, 22);
-        drawStar(gx, gy, 13, WHITE);
-    }
-
-    private void drawRightButtons() {
-        sr.begin(ShapeRenderer.ShapeType.Filled);
-        drawRoundRect(RIGHT_X - 12, 220, 148, 418, 22, new Color(0.01f, 0.07f, 0.22f, 0.68f));
-        drawPanelEdge(RIGHT_X - 12, 220, 148, 418, 22);
-        drawBigButton(runButton, BLUE);
-        drawBigButton(stepButton, PURPLE);
-        drawBigButton(pauseButton, new Color(0.12f, 0.36f, 0.76f, 1f));
-        drawBigButton(undoButton, new Color(0.57f, 0.30f, 0.94f, 1f));
-        drawBigButton(clearButton, ORANGE);
-        drawBigButton(resetButton, new Color(0.17f, 0.65f, 0.98f, 1f));
-        drawPlayIcon(runButton);
-        drawStepIcon(stepButton);
-        drawPauseIcon(pauseButton);
-        drawUndoIcon(undoButton);
-        drawTrashIcon(clearButton);
-        drawResetIcon(resetButton);
-        sr.end();
+        batch.begin();
+        batch.setColor(Color.WHITE);
+        batch.draw(themeAssets.labelInicio, sx - 36f, sy + 16f, 72f, 24f);
+        batch.end();
     }
 
     private void drawTextLayer() {
         batch.begin();
-        titleFont.setColor(WHITE);
-        titleFont.draw(batch, "Codea y", 58, 705);
-        titleFont.draw(batch, "juega!", 88, 677);
-
-        font.setColor(0.03f, 0.18f, 0.48f, 1f);
-        drawCentered(font, currentLevel().goal, 318, 664, 444, 48);
-
-        font.setColor(WHITE);
-        font.draw(batch, String.valueOf(coinsCollected * 30), 984, 696);
-        font.draw(batch, String.valueOf(stars), 1104, 696);
-        font.draw(batch, "Menu", 1194, 695);
-
-        font.setColor(WHITE);
-        font.draw(batch, "Bloques", LEFT_X + 72, SIDE_TOP_Y + SIDE_H - 18);
-        font.draw(batch, "Tu programa", PROGRAM_X + 24, PROGRAM_Y + PROGRAM_H - 13);
-        drawPaletteCategories();
-
-        for (CommandButton item : palette) {
-            smallFont.setColor(WHITE);
-            smallFont.draw(batch, item.label, item.rect.x + 58, item.rect.y + 24);
-        }
-
-        drawProgramText();
-        drawCodePanelText();
         drawBoardLabels();
-        drawButtonTexts();
-        drawGuideText();
         batch.end();
-    }
-
-    private void drawProgramText() {
-        smallFont.setColor(0.78f, 0.93f, 1f, 1f);
-        if (program.isEmpty()) {
-            smallFont.draw(batch, "Toca bloques para crear tu algoritmo.", PROGRAM_X + 28, PROGRAM_Y + 70);
-            smallFont.setColor(0.52f, 0.78f, 1f, 1f);
-            smallFont.draw(batch, "Aqui se vera el orden paso a paso.", PROGRAM_X + 28, PROGRAM_Y + 46);
-            return;
-        }
-
-        float blockX = PROGRAM_X + 34f;
-        float blockY = PROGRAM_Y + PROGRAM_H - 78f;
-        for (int i = 0; i < program.size(); i++) {
-            Command c = program.get(i);
-            float y = blockY - i * 34f;
-            if (y < PROGRAM_Y + 12f) {
-                smallFont.setColor(0.78f, 0.93f, 1f, 1f);
-                smallFont.draw(batch, "... mas bloques en la lista", blockX, PROGRAM_Y + 21);
-                break;
-            }
-            smallFont.setColor(i == activeProgramIndex ? new Color(1f, 0.96f, 0.58f, 1f) : WHITE);
-            smallFont.draw(batch, (i + 1) + ". " + c.label, blockX, y + 19);
-        }
     }
 
     private void drawPaletteCategories() {
@@ -1342,39 +1622,6 @@ public class RoboCodeGameScreen extends ScreenAdapter {
         smallFont.draw(batch, "Control", LEFT_X + 28, 450);
         smallFont.draw(batch, "Logica", LEFT_X + 28, 382);
         smallFont.draw(batch, "Accion", LEFT_X + 28, 272);
-    }
-
-    private void drawCodePanelText() {
-        font.setColor(WHITE);
-        font.draw(batch, "Codigo de Robo", CODE_X + 22f, CODE_Y + CODE_H - 22f);
-        smallFont.setColor(0.66f, 0.92f, 1f, 1f);
-        smallFont.draw(batch, "Bloques a instrucciones.", CODE_X + 18f, CODE_Y + CODE_H - 49f);
-
-        List<String> lines = buildCodeLines();
-        float y = CODE_Y + CODE_H - 88f;
-        for (int i = 0; i < lines.size(); i++) {
-            if (y < CODE_Y + 66f) {
-                codeFont.setColor(0.70f, 0.92f, 1f, 1f);
-                codeFont.draw(batch, "...", CODE_X + 22f, y);
-                break;
-            }
-            String line = lines.get(i);
-            if (line.contains("//")) {
-                codeFont.setColor(0.52f, 0.80f, 1f, 1f);
-            } else if (line.startsWith("      ")) {
-                codeFont.setColor(0.86f, 1f, 0.66f, 1f);
-            } else if (line.contains("if")) {
-                codeFont.setColor(0.95f, 0.72f, 1f, 1f);
-            } else if (line.contains("repetir")) {
-                codeFont.setColor(1f, 0.82f, 0.35f, 1f);
-            } else {
-                codeFont.setColor(0.92f, 0.98f, 1f, 1f);
-            }
-            codeFont.draw(batch, line, CODE_X + 18f, y);
-            y -= 20f;
-        }
-        smallFont.setColor(WHITE);
-        drawCentered(smallFont, "Ver explicacion", expandCodeButton.x, expandCodeButton.y + 2f, expandCodeButton.width, 18f);
     }
 
     private void drawCodeModal() {
@@ -1415,32 +1662,34 @@ public class RoboCodeGameScreen extends ScreenAdapter {
         sr.begin(ShapeRenderer.ShapeType.Filled);
         sr.setColor(0f, 0.01f, 0.05f, 0.62f);
         sr.rect(0, 0, W, H);
-        drawRoundRect(x + 8f, y - 10f, FAIL_MODAL_W, FAIL_MODAL_H, 26, new Color(0f, 0f, 0f, 0.42f));
-        drawRoundRect(x, y, FAIL_MODAL_W, FAIL_MODAL_H, 26, new Color(0.02f, 0.08f, 0.24f, 0.96f));
-        drawRoundRect(x + 18f, y + 18f, FAIL_MODAL_W - 36f, FAIL_MODAL_H - 36f, 20, new Color(0.04f, 0.16f, 0.35f, 0.72f));
-        drawPanelEdge(x, y, FAIL_MODAL_W, FAIL_MODAL_H, 26);
-        sr.setColor(1f, 0.38f, 0.26f, 0.30f + MathUtils.sin(time * 4f) * 0.06f);
-        sr.circle(x + 250f, y + 224f, 92f);
-        sr.setColor(1f, 0.84f, 0.14f, 0.22f);
-        sr.circle(x + 250f, y + 224f, 54f);
         drawFailButton(failRetryButton, new Color(0.08f, 0.58f, 0.95f, 1f), floatY);
         drawFailButton(failEditButton, new Color(0.48f, 0.25f, 0.90f, 1f), floatY);
         drawFailButton(failMenuButton, new Color(0.16f, 0.28f, 0.55f, 1f), floatY);
         sr.end();
 
         batch.begin();
+        batch.setColor(Color.WHITE);
+        batch.draw(themeAssets.modalFailPanel, x, y, FAIL_MODAL_W, FAIL_MODAL_H);
         batch.draw(currentRobotTexture(), x + 198f, y + 176f, 104f, 104f);
         titleFont.setColor(WHITE);
-        drawCentered(titleFont, "Perdiste", x + 60f, y + 292f, FAIL_MODAL_W - 120f, 34f);
+        drawCentered(titleFont, failGameOver ? "Sin vidas" : "Intento fallido",
+                x + 60f, y + 292f, FAIL_MODAL_W - 120f, 34f);
         font.setColor(new Color(1f, 0.86f, 0.62f, 1f));
-        drawCentered(font, failReason, x + 54f, y + 142f, FAIL_MODAL_W - 108f, 30f);
+        drawCentered(font, failReason, x + 54f, y + 158f, FAIL_MODAL_W - 108f, 30f);
         smallFont.setColor(new Color(0.82f, 0.95f, 1f, 1f));
-        drawCentered(smallFont, failAdvice, x + 58f, y + 118f, FAIL_MODAL_W - 116f, 24f);
+        drawCentered(smallFont, failAdvice, x + 58f, y + 132f, FAIL_MODAL_W - 116f, 24f);
+        smallFont.setColor(new Color(1f, 0.92f, 0.55f, 1f));
+        drawCentered(smallFont, failLivesMessage, x + 58f, y + 108f, FAIL_MODAL_W - 116f, 24f);
         smallFont.setColor(new Color(0.78f, 0.94f, 1f, 1f));
-        drawCentered(smallFont, "El error tambien ensena: depura tu algoritmo.", x + 64f, y + 96f, FAIL_MODAL_W - 128f, 22f);
+        drawCentered(smallFont, failGameOver
+                        ? "No te rindas: repasa los bloques y vuelve al nivel 1."
+                        : "Corrige tu algoritmo y sigue jugando.",
+                x + 64f, y + 84f, FAIL_MODAL_W - 128f, 22f);
         smallFont.setColor(WHITE);
-        drawCentered(smallFont, "Nuevo", failRetryButton.x, failRetryButton.y + floatY + 4f, failRetryButton.width, 18f);
-        drawCentered(smallFont, "Editar", failEditButton.x, failEditButton.y + floatY + 4f, failEditButton.width, 18f);
+        drawCentered(smallFont, failGameOver ? "Reiniciar" : "Seguir",
+                failRetryButton.x, failRetryButton.y + floatY + 4f, failRetryButton.width, 18f);
+        drawCentered(smallFont, failGameOver ? "Menu" : "Editar",
+                failEditButton.x, failEditButton.y + floatY + 4f, failEditButton.width, 18f);
         drawCentered(smallFont, "Menu", failMenuButton.x, failMenuButton.y + floatY + 4f, failMenuButton.width, 18f);
         batch.end();
     }
@@ -1460,21 +1709,16 @@ public class RoboCodeGameScreen extends ScreenAdapter {
         sr.begin(ShapeRenderer.ShapeType.Filled);
         sr.setColor(0f, 0.01f, 0.05f, 0.58f);
         sr.rect(0, 0, W, H);
-        drawRoundRect(x + 8f, y - 10f, FAIL_MODAL_W, FAIL_MODAL_H, 26, new Color(0f, 0f, 0f, 0.38f));
-        drawRoundRect(x, y, FAIL_MODAL_W, FAIL_MODAL_H, 26, new Color(0.02f, 0.12f, 0.26f, 0.97f));
-        drawRoundRect(x + 18f, y + 18f, FAIL_MODAL_W - 36f, FAIL_MODAL_H - 36f, 20, new Color(0.02f, 0.28f, 0.36f, 0.72f));
-        drawPanelEdge(x, y, FAIL_MODAL_W, FAIL_MODAL_H, 26);
         drawCelebrationStars(x, y);
-        sr.setColor(0.16f, 1f, 0.62f, 0.22f + MathUtils.sin(time * 4f) * 0.05f);
-        sr.circle(x + 250f, y + 224f, 104f);
-        sr.setColor(1f, 0.88f, 0.16f, 0.30f);
-        sr.circle(x + 250f, y + 224f, 62f);
         drawFailButton(winNewButton, new Color(0.08f, 0.66f, 0.96f, 1f), floatY);
         drawFailButton(winPracticeButton, new Color(0.17f, 0.74f, 0.34f, 1f), floatY);
         drawFailButton(winMenuButton, new Color(0.48f, 0.25f, 0.90f, 1f), floatY);
         sr.end();
 
         batch.begin();
+        batch.setColor(Color.WHITE);
+        batch.draw(themeAssets.modalWinPanel, x, y, FAIL_MODAL_W, FAIL_MODAL_H);
+        batch.draw(themeAssets.bannerVictory, x + 72f, y + FAIL_MODAL_H - 72f, FAIL_MODAL_W - 144f, 42f);
         batch.draw(roboWin, x + 190f, y + 166f, 120f, 120f);
         titleFont.setColor(WHITE);
         drawCentered(titleFont, "Mision completada!", x + 42f, y + 294f, FAIL_MODAL_W - 84f, 34f);
@@ -1483,7 +1727,10 @@ public class RoboCodeGameScreen extends ScreenAdapter {
         smallFont.setColor(new Color(0.82f, 1f, 0.88f, 1f));
         drawCentered(smallFont, winLesson, x + 58f, y + 118f, FAIL_MODAL_W - 116f, 24f);
         smallFont.setColor(new Color(0.82f, 0.95f, 1f, 1f));
-        drawCentered(smallFont, "Puntaje: " + (coinsCollected * 30) + " | Estrellas: " + stars, x + 64f, y + 96f, FAIL_MODAL_W - 128f, 22f);
+        drawCentered(smallFont,
+                "Creditos: +" + lastCreditsEarned + " | Estrellas: " + coinsCollected + "/" + coins.size()
+                        + " | Nota: " + levelRating + "/3",
+                x + 64f, y + 96f, FAIL_MODAL_W - 128f, 22f);
         smallFont.setColor(WHITE);
         drawCentered(smallFont, hasNextLevel() ? "Siguiente" : "Nuevo", winNewButton.x, winNewButton.y + floatY + 4f, winNewButton.width, 18f);
         drawCentered(smallFont, "Practicar", winPracticeButton.x, winPracticeButton.y + floatY + 4f, winPracticeButton.width, 18f);
@@ -1629,23 +1876,16 @@ public class RoboCodeGameScreen extends ScreenAdapter {
     }
 
     private void drawBoardLabels() {
-        font.setColor(WHITE);
-        drawCentered(font, "Inicio", cellCenterX(startCol) - 42, cellCenterY(startRow) - 40, 84, 26);
-        drawCentered(font, "Meta", cellCenterX(goalCol) - 42, cellCenterY(goalRow) - 44, 84, 28);
         if (shipRow >= 0 && !shipBoarded) {
             smallFont.setColor(new Color(0.78f, 1f, 1f, 1f));
-            drawCentered(smallFont, "Nave", cellCenterX(shipCol) - 34, cellCenterY(shipRow) - 40, 68, 22);
+            drawCentered(smallFont, "NAVE", cellCenterX(shipCol) - 34f, cellCenterY(shipRow) - 40f, 68f, 22f);
         }
-    }
-
-    private void drawButtonTexts() {
-        smallFont.setColor(WHITE);
-        drawCentered(smallFont, "Ejecutar", runButton.x, runButton.y + 5, runButton.width, 18);
-        drawCentered(smallFont, "Paso", stepButton.x, stepButton.y + 5, stepButton.width, 18);
-        drawCentered(smallFont, "Pausar", pauseButton.x, pauseButton.y + 5, pauseButton.width, 18);
-        drawCentered(smallFont, "Deshacer", undoButton.x, undoButton.y + 5, undoButton.width, 18);
-        drawCentered(smallFont, "Borrar", clearButton.x, clearButton.y + 5, clearButton.width, 18);
-        drawCentered(smallFont, "Reiniciar", resetButton.x, resetButton.y + 5, resetButton.width, 18);
+        if (hasTeleportShip()) {
+            smallFont.setColor(new Color(0.55f, 1f, 0.85f, 1f));
+            drawCentered(smallFont, "LLEGADA", cellCenterX(shipDestCol) - 38f, cellCenterY(shipDestRow) - 40f, 76f, 22f);
+        }
+        smallFont.setColor(new Color(1f, 0.92f, 0.35f, 1f));
+        drawCentered(smallFont, "META", cellCenterX(goalCol) - 28f, cellCenterY(goalRow) - 52f, 56f, 20f);
     }
 
     private void drawGuideText() {
@@ -1660,29 +1900,45 @@ public class RoboCodeGameScreen extends ScreenAdapter {
     }
 
     private void drawShipOnBoard() {
-        if (shipRow < 0 || shipBoarded) {
-            return;
-        }
-        float x = cellCenterX(shipCol);
-        float y = cellCenterY(shipRow);
-        float pulse = MathUtils.sin(time * 3f) * 3f;
         batch.begin();
-        batch.setColor(0.72f, 0.98f, 1f, 0.18f);
-        batch.draw(shipTexture, x - 44f, y - 30f + pulse, 88f, 62f);
-        batch.setColor(WHITE);
-        batch.draw(shipTexture, x - 36f, y - 25f + pulse, 72f, 50f);
+        batch.setColor(Color.WHITE);
+        if (shipRow >= 0 && !shipBoarded) {
+            drawShipSpriteAt(shipRow, shipCol, 1f);
+        }
+        if (hasTeleportShip()) {
+            batch.setColor(0.75f, 1f, 0.92f, 0.95f);
+            drawShipSpriteAt(shipDestRow, shipDestCol, 0.88f);
+        }
+        batch.setColor(Color.WHITE);
         batch.end();
+    }
+
+    private void drawShipSpriteAt(int row, int col, float scale) {
+        float x = cellCenterX(col);
+        float y = cellCenterY(row);
+        float pulse = MathUtils.sin(time * 2.2f + row + col) * 4f;
+        float w = 88f * scale;
+        float h = 62f * scale;
+        batch.draw(shipTexture, x - w / 2f, y - h / 2f + pulse, w, h);
     }
 
     private void drawRobotOnBoard() {
         Texture robot = currentRobotTexture();
         float size = mood == RobotMood.WIN ? 92f : usingShip ? 58f : 76f;
+        float bounce = mood == RobotMood.IDLE ? MathUtils.sin(time * 2.4f) * 3f : 0f;
+        float winScale = mood == RobotMood.WIN ? 1f + MathUtils.sin(time * 4f) * 0.06f : 1f;
+        float blinkCycle = time % 4.2f;
+        float alpha = mood == RobotMood.IDLE && blinkCycle > 3.75f && blinkCycle < 3.92f ? 0.78f : 1f;
+
         batch.begin();
         if (usingShip) {
             batch.setColor(WHITE);
-            batch.draw(shipTexture, robotX - 48f, robotY - 28f, 96f, 66f);
+            batch.draw(shipTexture, robotX - 48f, robotY - 28f + bounce, 96f, 66f);
         }
-        batch.draw(robot, robotX - size / 2f, robotY - size / 2f + 10f, size, size);
+        batch.setColor(1f, 1f, 1f, alpha);
+        float drawSize = size * winScale;
+        batch.draw(robot, robotX - drawSize / 2f, robotY - drawSize / 2f + 10f + bounce, drawSize, drawSize);
+        batch.setColor(WHITE);
         batch.end();
     }
 
@@ -1865,11 +2121,11 @@ public class RoboCodeGameScreen extends ScreenAdapter {
     }
 
     private float cellCenterX(int col) {
-        return BOARD_X + col * CELL + CELL / 2f;
+        return boardX + col * cellSize + cellSize / 2f;
     }
 
     private float cellCenterY(int row) {
-        return BOARD_Y + (ROWS - 1 - row) * CELL + CELL / 2f;
+        return boardY + (mapRows - 1 - row) * cellSize + cellSize / 2f;
     }
 
     private boolean isWalkable(int row, int col) {
@@ -1884,7 +2140,7 @@ public class RoboCodeGameScreen extends ScreenAdapter {
     }
 
     private boolean isInside(int row, int col) {
-        return row >= 0 && row < ROWS && col >= 0 && col < COLS;
+        return row >= 0 && row < mapRows && col >= 0 && col < mapCols;
     }
 
     private boolean isFlightTile(int row, int col) {
@@ -1933,6 +2189,9 @@ public class RoboCodeGameScreen extends ScreenAdapter {
         roboUp.dispose();
         roboError.dispose();
         roboWin.dispose();
+        if (themeAssets != null) {
+            themeAssets.dispose();
+        }
     }
 
     private enum RobotMood {
@@ -1963,6 +2222,20 @@ public class RoboCodeGameScreen extends ScreenAdapter {
 
         boolean isRepeatable() {
             return this == FORWARD || this == TURN_LEFT || this == TURN_RIGHT;
+        }
+
+        String paletteIcon() {
+            return switch (this) {
+                case FORWARD -> "forward";
+                case TURN_LEFT -> "turn_left";
+                case TURN_RIGHT -> "turn_right";
+                case REPEAT_PREVIOUS -> "loop";
+                case IF_WALL -> "wall";
+                case IF_PATH_FREE -> "path";
+                case COLLECT_STAR -> "star";
+                case USE_SHIP -> "ship";
+                default -> "say";
+            };
         }
     }
 

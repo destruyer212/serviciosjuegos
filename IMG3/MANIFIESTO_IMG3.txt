@@ -1,0 +1,26 @@
+IMG3 organizado por Codex
+
+Assets esperados: 87
+Creados con dibujo local PNG: 0
+Copiados/escalados desde assets existentes: 0
+Normalizados a tamano final: 18
+Ya existian y no se tocaron: 69
+Copias en carpetas numeradas: 88
+Faltantes despues del proceso: 0
+
+Carpetas numeradas:
+ - 01_FONDOS
+ - 02_TILES_DEL_MAPA
+ - 03_PROPS_DEL_MAPA
+ - 04_ESTRELLAS_Y_COLECTIBLES
+ - 05_PERSONAJES
+ - 06_MARCO_DEL_TABLERO
+ - 07_PANELES_UI
+ - 08_BOTONES
+ - 09_ICONOS_HUD_SUPERIOR
+ - 10_FOOTER_COFRE_LOGROS_ROBOTS
+ - 11_BLOQUES_DE_CODIGO
+ - 12_PANEL_MI_PROGRAMA
+ - 13_MODALES
+ - 14_ETIQUETAS_Y_LOGO
+ - 15_EFECTOS_DE_MAPA
